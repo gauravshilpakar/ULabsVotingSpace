@@ -64,7 +64,7 @@ option,
 .login-dark form .forgot {
   display: block;
   text-align: center;
-  font-size: 12px;
+  font-size: 14px;
   color: #6f7a85;
   opacity: 0.9;
   text-decoration: none;
@@ -81,9 +81,19 @@ option,
   
 .nav-item{
   margin: 0 20px 0 20px;
+  display: flex;
+  align-items: center;
 }
 
-
+.usericon{
+  width: 30px;
+  height: 30px;
+  border-radius: 100%;
+  margin-right: 10px;
+}
+.navbar-dark .navbar-text a {
+  color: #737373;
+}
 
 
 /* mobile */
@@ -93,9 +103,9 @@ option,
     justify-content: center;
     align-items: center;
     display: grid;
-    grid-gap: 2rem;
+    grid-gap: 1rem;
     grid-template-columns: repeat(1, 1fr);
-    padding: 90px 20px;
+    padding: 100px 20px;
   }
 }
 
@@ -106,11 +116,11 @@ option,
     justify-content: center;
     align-items: center;
     display: grid;
-    grid-gap: 2rem;
+    grid-gap: 1rem;
     grid-template-columns: repeat(2, 400px);
     grid-auto-rows: auto;
-    padding: 90px 40px;
-
+    padding: 100px 40px;
+    
   }
   .embed-responsive{ 
     max-width: 400px;
@@ -162,9 +172,7 @@ iframe{
   line-height:24px;
   color:#737373;
 }
-.bg-dark{
-  background-color: #262626;
-}
+
 
 a.gist-meta:hover{
   color: #fff;
@@ -184,10 +192,8 @@ a.gist-meta:hover{
   text-decoration: none;
   color: white;
 }
- 
 
-
-
+.login,
 .highlight-link {
   text-decoration: none;
   color: #737373;
@@ -195,11 +201,24 @@ a.gist-meta:hover{
   padding: 0px 1px;
   transition: all .5s ease-in-out;
   box-sizing: border-box;
-  text-decoration: none;
   box-shadow: inset 0 -2px 0 #007FFF;
-
 }
+.login:hover,
 .highlight-link:hover {
+  text-decoration: none;
 box-shadow: inset 0 -55px 0 0 #007FFF;
 color: white;
+}
+
+@media only screen and (max-width: 990px) {
+.navbar-dark{
+  background-color: #1a1d20;
+}
+}
+@media only screen and (min-width: 990px) {
+.navbar-dark{
+  background-color: #1a1d20;
+  margin: 0 200px 0 200px;
+
+}
 }

@@ -1,19 +1,26 @@
-import requests
 import datetime
-import uuid
 import json
-from flask import Flask, render_template, redirect, request, url_for, session, jsonify
-from flask_sqlalchemy import SQLAlchemy
-from flask_admin import Admin, form
-from flask_login import LoginManager, login_required, login_user, logout_user, current_user, UserMixin
+import uuid
 
+import requests
+from flask import (
+    Flask, jsonify, redirect, render_template, request, session, url_for)
+from flask_admin import Admin, form
+from flask_login import (
+    LoginManager, UserMixin, current_user, login_required, login_user,
+    logout_user)
+from flask_sqlalchemy import SQLAlchemy
 from oauthlib.oauth2 import WebApplicationClient
+from requests.exceptions import HTTPError
 from requests_oauthlib import OAuth2Session
+from flask_admin.contrib.sqla import ModelView
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql+psycopg2://postgres:MHEECHA1lamo@localhost:5432/ulabsvotingspace"
 app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///test.db'
 app.secret_key = str(uuid.uuid4())
+
+admin = Admin(app)
 
 db = SQLAlchemy(app)
 
@@ -34,28 +41,21 @@ class Auth:
     USER_INFO = 'https://www.googleapis.com/userinfo/v2/me'
     SCOPE = ['profile', 'email']
 
-# client = WebApplicationClient(GOOGLE_CLIENT_ID)
 
+class Videos(db.Model):
+    _id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String())
+    link = db.Column(db.String())
 
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
+    def __init__(self, name, link):
+        self.name = name
+        self.link = link
 
-
-def get_google_auth(state=None, token=None):
-    if token:
-        return OAuth2Session(Auth.CLIENT_ID, token=token)
-    if state:
-        return OAuth2Session(
-            Auth.CLIENT_ID,
-            state=state,
-            redirect_uri=Auth.REDIRECT_URI)
-    oauth = OAuth2Session(
-        Auth.CLIENT_ID,
-        redirect_uri=Auth.REDIRECT_URI,
-        scope=Auth.SCOPE)
-    return oauth
-
+    def serialize(self):
+        return{
+            'name': self.name,
+            'link': self.link
+        }
 
 # class User(db.Model):
 #     __tablename__ = 'users'
@@ -92,6 +92,7 @@ def get_google_auth(state=None, token=None):
 #             "zip_": self.zip_
 #         }
 
+
 class User(db.Model, UserMixin):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
@@ -102,14 +103,29 @@ class User(db.Model, UserMixin):
     tokens = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow())
 
-# def get_google_provider_cfg():
-#     return requests.get(GOOGLE_DISCOVERY_URL).json()
+
+admin.add_view(ModelView(User, db.session))
+admin.add_view(ModelView(Videos, db.session))
 
 
-@app.route('/')
-@login_required
-def index():
-    return render_template('index.html')
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+
+def get_google_auth(state=None, token=None):
+    if token:
+        return OAuth2Session(Auth.CLIENT_ID, token=token)
+    if state:
+        return OAuth2Session(
+            Auth.CLIENT_ID,
+            state=state,
+            redirect_uri=Auth.REDIRECT_URI)
+    oauth = OAuth2Session(
+        Auth.CLIENT_ID,
+        redirect_uri=Auth.REDIRECT_URI,
+        scope=Auth.SCOPE)
+    return oauth
 
 
 @app.route('/login', methods=["GET", "POST"])
@@ -120,7 +136,7 @@ def login():
     auth_url, state = google.authorization_url(
         Auth.AUTH_URI, access_type='offline')
     session['oauth_state'] = state
-    print(f"sesh: {session['oauth_state']}")
+    print(f"sesh:\n {session['oauth_state']}")
     return render_template('login.html', auth_url=auth_url)
 
 
@@ -136,15 +152,12 @@ def callback():
     if 'code' not in request.args and 'state' not in request.args:
         return redirect(url_for('login'))
     else:
-        # Execution reaches here when user has
-        # successfully authenticated our app.
+        # Execution reaches here when user has successfully authenticated our app.
         google = get_google_auth(state=session['oauth_state'])
         try:
             token = google.fetch_token(
-                Auth.TOKEN_URI,
-                client_secret=Auth.CLIENT_SECRET,
-                authorization_response=request.url)
-        except:
+                Auth.TOKEN_URI, client_secret=Auth.CLIENT_SECRET, authorization_response=request.url)
+        except HTTPError:
             return 'HTTPError occurred.'
         google = get_google_auth(token=token)
         resp = google.get(Auth.USER_INFO)
@@ -156,7 +169,6 @@ def callback():
                 user = User()
                 user.email = email
             user.name = user_data['name']
-            print(token)
             user.tokens = json.dumps(token)
             user.avatar = user_data['picture']
             db.session.add(user)
@@ -166,37 +178,42 @@ def callback():
         return 'Could not fetch your information.'
 
 
+@app.route('/')
 @app.route("/index/")
-def home():
-    print(jsonify(session))
-    return render_template("index.html")
+def index():
+    v_ = Videos.query.all()
+
+    videos_json = [video.serialize() for video in v_]
+    print(v_)
+    print(videos_json)
+    return render_template("index.html", links=videos_json)
 
 
-# @app.route("/newaccount/", methods=["POST", "GET"])
-# def newaccount():
-#     if request.method == "POST":
-#         firstName = request.form["firstName"]
-#         lastName = request.form["lastName"]
-#         email = request.form["email"]
-#         password = request.form["password"]
-#         address = request.form["address"]
-#         city = request.form["city"]
-#         state = request.form["state"]
-#         zip_ = request.form["zip"]
-#         newUser = User(firstName, lastName, email,
-#                        password, address, city, state, zip_)
-#         return newUser.serialize()
-#     else:
-#         return render_template("newaccount.html")
+@app.route("/newaccount/", methods=["POST", "GET"])
+def newaccount():
+    if request.method == "POST":
+        firstName = request.form["firstName"]
+        lastName = request.form["lastName"]
+        email = request.form["email"]
+        password = request.form["password"]
+        address = request.form["address"]
+        city = request.form["city"]
+        state = request.form["state"]
+        zip_ = request.form["zip"]
+        newUser = User(firstName, lastName, email,
+                       password, address, city, state, zip_)
+        return newUser.serialize()
+    else:
+        return render_template("newaccount.html")
+
 
 @app.route('/logout')
 @login_required
 def logout():
-    logout_user()
-
     session.pop('access_token', None)
+    logout_user()
     return redirect(url_for('index'))
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, ssl_context=('./ssl.crt', './ssl.key'))
