@@ -1,0 +1,21 @@
+{% extends "account.html" %}
+
+{% block form %}
+
+<form method="post">
+
+    <h2 class="sr-only">Login Form</h2>
+    <div class="form-group"><input class="form-control" type="email" name="email" placeholder="Email"></div>
+    <div class="form-group"><input class="form-control" type="password" name="password" placeholder="Password">
+    </div>
+    <div class="form-group"><button class="btn btn-primary btn-block" type="submit">Log In</button></div>
+    <a class="forgot" href="http://192.168.56.1:8000/#">Forgot your email or password?</a>
+    <br />
+    <div class="forgot">
+        <!-- Not a user? <a href="{{ url_for('newaccount') }}" style="font-weight: 800;">Create an Account Here!</a> -->
+    </div>
+
+
+</form>
+
+{% endblock %}

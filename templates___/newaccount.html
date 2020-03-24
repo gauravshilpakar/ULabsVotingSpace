@@ -1,0 +1,112 @@
+{% extends "account.html" %}
+
+{% block form %}
+<form method="POST">
+    <h2 class="sr-only">Create an Account!</h2>
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <input type="text" class="form-control" id="inputEmail4" name="firstName" placeholder="First Name">
+        </div>
+        <div class="form-group col-md-6">
+
+            <input type="text" class="form-control" id="inputPassword4" name="lastName" placeholder="Last Name">
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-6">
+
+            <input type="email" class="form-control" id="inputEmail4" name="email" placeholder="Email">
+        </div>
+        <div class="form-group col-md-6">
+
+            <input type="password" class="form-control" id="inputPassword4" name="password" placeholder="Password">
+        </div>
+    </div>
+    <div class="form-group">
+
+        <input type="text" class="form-control" id="inputAddress" name="address" placeholder="Street Address">
+    </div>
+
+    <div class="form-row">
+        <div class="form-group col-md-6">
+
+            <input type="text" class="form-control" id="inputCity" name="city" placeholder="City">
+        </div>
+        <div class="form-group col-md-4">
+            <label for="inputState">State</label>
+            <select id="inputState" name="state" class="form-control">
+                <option selected>Choose...</option>
+                <option value="">Alaska</option>
+                <option value="">Arizona</option>
+                <option value="">Arkansas</option>
+                <option value="">California</option>
+                <option value="">Colorado</option>
+                <option value="">Connecticut</option>
+                <option value="">Delaware</option>
+                <option value="">Florida</option>
+                <option value="">Georgia</option>
+                <option value="">Hawaii</option>
+                <option value="">Idaho</option>
+                <option value="">Illinois</option>
+                <option value="">Indiana</option>
+                <option value="">Iowa</option>
+                <option value="">Kansas</option>
+                <option value="">Kentucky</option>
+                <option value="">Louisiana</option>
+                <option value="">Maine</option>
+                <option value="">Maryland</option>
+                <option value="">Massachusetts</option>
+                <option value="">Michigan</option>
+                <option value="">Minnesota</option>
+                <option value="">Mississippi</option>
+                <option value="">Missouri</option>
+                <option value="">Montana</option>
+                <option value="">Nebraska</option>
+                <option value="">Nevada</option>
+                <option value="">New Hampshire</option>
+                <option value="">New Jersey</option>
+                <option value="">New Mexico</option>
+                <option value="">New York</option>
+                <option value="">North Carolina</option>
+                <option value="">North Dakota</option>
+                <option value="">Ohio</option>
+                <option value="">Oklahoma</option>
+                <option value="">Oregon</option>
+                <option value="">Pennsylvania</option>
+                <option value="">Rhode Island</option>
+                <option value="">South Carolina</option>
+                <option value="">South Dakota</option>
+                <option value="">Tennessee</option>
+                <option value="">Texas</option>
+                <option value="">Utah</option>
+                <option value="">Vermont</option>
+                <option value="">Virginia</option>
+                <option value="">Washington</option>
+                <option value="">West Virginia</option>
+                <option value="">Wisconsin</option>
+                <option value="">Wyoming</option>
+            </select>
+        </div>
+        <div class="form-group col-md-2">
+
+            <input type="text" class="form-control" id="inputZip" name="zip" placeholder="Zip">
+        </div>
+    </div>
+    <div class="form-group">
+        <!-- <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="gridCheck">
+                <label class="form-check-label" for="gridCheck">
+                    Check me out
+                </label>
+            </div> -->
+    </div>
+    <div class="form-group"><button class="btn btn-primary btn-block" type="submit">Submit</button></div>
+
+    <br />
+    <div class="forgot">
+        Already have an account? <a href="{{ url_for('home') }}" style="font-weight: 800;">Login!</a>
+    </div>
+</form>
+
+</div>
+{% endblock %}

@@ -1,0 +1,205 @@
+@import url('https://fonts.googleapis.com/css?family=IBM+Plex+Sans&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Parisienne|Source+Sans+Pro&display=swap');
+body,html{
+  background: #1a1d20;
+  margin: 0;
+  height: 100%;
+}
+nav{
+  font-family: 'Source Sans Pro', sans-serif;
+  text-transform: uppercase;
+letter-spacing: 2px;
+}
+
+.bimg{
+    background-image: url("../img/skye-studios-NDLLFxTELrU-unsplash.jpg");
+    height: 100%; 
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}  
+
+
+option,
+.login-dark form {
+  max-width: 500px;
+  width: 90%;
+  background-color: #1e2833;
+  padding: 40px;
+  border-radius: 4px;
+  transform: translate(-50%, -50%);
+  position: absolute;
+  top: 25rem;
+  left: 50%;
+  color: #fff;
+  box-shadow: 3px 3px 4px rgba(0,0,0,0.2);
+}
+
+.login-dark form .form-control {
+  background: none;
+  border: none;
+  border-bottom: 1px solid #434a52;
+  border-radius: 0;
+  box-shadow: none;
+  outline: none;
+  color: inherit;
+}
+
+.login-dark form .btn-primary {
+  background: #214a80;
+  border: none;
+  border-radius: 4px;
+  padding: 11px;
+  box-shadow: none;
+  margin-top: 26px;
+  text-shadow: none;
+  outline: none;
+}
+
+.login-dark form .btn-primary:hover, .login-dark form .btn-primary:active {
+  background: #214a80;
+  outline: none;
+}
+
+.login-dark form .forgot {
+  display: block;
+  text-align: center;
+  font-size: 12px;
+  color: #6f7a85;
+  opacity: 0.9;
+  text-decoration: none;
+}
+  
+.login-dark form .forgot:hover, .login-dark form .forgot:active {
+  opacity: 1;
+  text-decoration: none;
+}
+
+.login-dark form .btn-primary:active {
+  transform: translateY(1px);
+}
+  
+.nav-item{
+  margin: 0 20px 0 20px;
+}
+
+
+
+
+/* mobile */
+@media only screen and (max-width: 800px) {
+  .videos{
+    /* margin: 20px 20px 20px 20px;  */
+    justify-content: center;
+    align-items: center;
+    display: grid;
+    grid-gap: 2rem;
+    grid-template-columns: repeat(1, 1fr);
+    padding: 90px 20px;
+  }
+}
+
+/* desktop */
+@media only screen and (min-width: 800px) {
+  .videos{
+    /* margin: 20px 20px 20px 20px;  */
+    justify-content: center;
+    align-items: center;
+    display: grid;
+    grid-gap: 2rem;
+    grid-template-columns: repeat(2, 400px);
+    grid-auto-rows: auto;
+    padding: 90px 40px;
+
+  }
+  .embed-responsive{ 
+    max-width: 400px;
+  }
+}
+iframe{
+  padding: 0;
+  font-size: 30px;
+  border: none;
+}
+
+.videocontainer{
+  /* background: #d9d9d9; */
+  /* margin: 100px 40px 0px 40px; */
+  border-radius: 3px;
+  background-color: transparent;
+}
+
+.socials {
+  display: flex;
+  justify-content: center
+}
+
+.socials a {
+  text-decoration: none;
+}
+
+.socials .s {
+  margin-left: 5px;
+}
+.s {
+  width: 30px;
+  filter: invert(50%);
+  border: 0;
+  text-decoration: none;
+  outline: none;
+  opacity: 0.7;
+}
+
+.s:hover {
+  opacity: 1;
+  filter:invert(100%);
+}
+
+.site-footer
+{
+  padding:45px 0 20px;
+  font-size:15px;
+  line-height:24px;
+  color:#737373;
+}
+.bg-dark{
+  background-color: #262626;
+}
+
+a.gist-meta:hover{
+  color: #fff;
+}
+
+.ubiq{
+  font-family: 'Parisienne', cursive; 
+  font-size: 30px;
+  margin:20px;
+  color: #737373;
+  text-decoration: none;
+  transition: all .5s ease-in-out;
+
+}
+
+.ubiq:hover{
+  text-decoration: none;
+  color: white;
+}
+ 
+
+
+
+.highlight-link {
+  text-decoration: none;
+  color: #737373;
+  display: inline-block;
+  padding: 0px 1px;
+  transition: all .5s ease-in-out;
+  box-sizing: border-box;
+  text-decoration: none;
+  box-shadow: inset 0 -2px 0 #007FFF;
+
+}
+.highlight-link:hover {
+box-shadow: inset 0 -55px 0 0 #007FFF;
+color: white;
+}
