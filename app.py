@@ -35,7 +35,8 @@ login_manager.init_app(app)
 class Auth:
     CLIENT_ID = "440148976425-33utej6ri23ksjuuatbnfbaqo8nt0ruu.apps.googleusercontent.com"
     CLIENT_SECRET = "6JA9YD0bwe3BialVcsiQ2oR1"
-    REDIRECT_URI = 'https://127.0.0.1:5000/gCallback'
+    # REDIRECT_URI = 'https://127.0.0.1:5000/gCallback'
+    REDIRECT_URI = 'https://ulabsvotingspace.herokuapp.com/gCallback'
     AUTH_URI = 'https://accounts.google.com/o/oauth2/auth'
     TOKEN_URI = 'https://accounts.google.com/o/oauth2/token'
     USER_INFO = 'https://www.googleapis.com/userinfo/v2/me'
