@@ -16,8 +16,8 @@ from requests_oauthlib import OAuth2Session
 from flask_admin.contrib.sqla import ModelView
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-# app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql+psycopg2://postgres:MHEECHA1lamo@localhost:5432/ulabsvotingspace"
-app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///test.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = "postgres://sifnuyotpswqcu:3e6c5d3c3579caa654efae9ee886fce3ce6f020ec4afc8bbe28b1c7c4ff8e264@ec2-35-174-88-65.compute-1.amazonaws.com:5432/ddl6lhoj344ta"
+# app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///test.db'
 app.secret_key = str(uuid.uuid4())
 
 admin = Admin(app)
@@ -46,15 +46,18 @@ class Videos(db.Model):
     _id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String())
     link = db.Column(db.String())
+    votes = db.Column(db.Integer())
 
     def __init__(self, name, link):
         self.name = name
         self.link = link
+        self.votes = votes
 
     def serialize(self):
         return{
             'name': self.name,
-            'link': self.link
+            'link': self.link,
+            'votes': self.votes
         }
 
 # class User(db.Model):
@@ -178,14 +181,13 @@ def callback():
         return 'Could not fetch your information.'
 
 
-@app.route('/')
-@app.route("/index/")
+@app.route('/', methods=["POST", "GET"])
 def index():
     v_ = Videos.query.all()
 
     videos_json = [video.serialize() for video in v_]
-    print(v_)
-    print(videos_json)
+    if request.method == "POST" and current_user.is_authenticated:
+        return render_template("index.html", links=videos_json, authenticated=True)
     return render_template("index.html", links=videos_json)
 
 
