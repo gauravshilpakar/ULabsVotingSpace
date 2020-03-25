@@ -16,8 +16,8 @@ from requests_oauthlib import OAuth2Session
 from flask_admin.contrib.sqla import ModelView
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = "postgres://sifnuyotpswqcu:3e6c5d3c3579caa654efae9ee886fce3ce6f020ec4afc8bbe28b1c7c4ff8e264@ec2-35-174-88-65.compute-1.amazonaws.com:5432/ddl6lhoj344ta"
-# app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///test.db'
+# app.config['SQLALCHEMY_DATABASE_URI'] = "postgres://sifnuyotpswqcu:3e6c5d3c3579caa654efae9ee886fce3ce6f020ec4afc8bbe28b1c7c4ff8e264@ec2-35-174-88-65.compute-1.amazonaws.com:5432/ddl6lhoj344ta"
+app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///test.db'
 app.secret_key = str(uuid.uuid4())
 
 admin = Admin(app)
@@ -140,7 +140,7 @@ def login():
     auth_url, state = google.authorization_url(
         Auth.AUTH_URI, access_type='offline')
     session['oauth_state'] = state
-    print(f"sesh:\n {session['oauth_state']}")
+    print(f"\n\n\n\nsesh:\n {session['oauth_state']}\n\n\n\n")
     return render_template('login.html', auth_url=auth_url)
 
 
