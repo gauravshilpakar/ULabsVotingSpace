@@ -1,7 +1,25 @@
 {% extends "account.html" %}
 
 {% block form %}
+<style>
+    .emoji {
+        display: inline-block;
+        vertical-align: text-top;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        width: 60px;
+        height: 60px;
+        background-image: url(../static/img/Down_Pointing_Backhand_Index_Emoji_Icon_ios10_1024x1024.png);
+        cursor: pointer;
+        transition: all .2s ease-in-out;
+        width: 100%;
+    }
 
+    .emoji:hover {
+        margin-top: 10px;
+    }
+</style>
 <form method="post">
 
     <h2 class="sr-only">Login Form</h2>
@@ -11,13 +29,10 @@
     <div class="form-group"><button class="btn btn-primary btn-block" type="submit">Log In</button></div>
     <!-- <a class="forgot" href="http://192.168.56.1:8000/#">Forgot your email or password?</a> -->
     <br />
-    <div style="font-size: 30px;
-    text-align: center;">👇</div>
+    <div class="emoji wave-hand animated"></div>
     <div class="forgot">
-
-        <a href="{{auth_url}}"><img style="height: 50px;" src="../static/icons/btn_google_signin_dark_normal_web@2x.png"
-                alt="Login With Google"></a>
-        <!-- Not a user? <a href="{{ url_for('newaccount') }}" style="font-weight: 800;">Create an Account Here!</a> -->
+        <a href="{{auth_url}}"><img style="height: 50px; margin-top: 20px;"
+                src="../static/icons/btn_google_signin_dark_normal_web@2x.png" alt="Login With Google"></a>
     </div>
 
 
