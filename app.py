@@ -106,7 +106,6 @@ def login():
 
 @app.route('/gCallback')
 def callback():
-    # Redirect user to home page if already logged in.
     if current_user is not None and current_user.is_authenticated:
         return redirect(url_for('index'))
     if 'error' in request.args:
@@ -116,19 +115,17 @@ def callback():
     if 'code' not in request.args and 'state' not in request.args:
         return redirect(url_for('login'))
     else:
-        # Execution reaches here when user has successfully authenticated our app.
-
-        try:
-            google = get_google_auth(state=session['oauth_state'])
-            token = google.fetch_token(
-                ProductionConfig.TOKEN_URI, client_secret=ProductionConfig.CLIENT_SECRET, authorization_response=request.url)
-        except HTTPError:
-            return 'HTTPError occurred.'
-        finally:
-            google = get_google_auth(token=token)
-            resp = google.get(ProductionConfig.USER_INFO)
-
-            # if resp.status_code == 200:
+        google = get_google_auth(state=session['oauth_state'])
+        # try:
+        token = google.fetch_token(
+            ProductionConfig.TOKEN_URI,
+            client_secret=ProductionConfig.CLIENT_SECRET,
+            authorization_response=request.url)
+        # except HTTPError:
+        #     return 'HTTPError occurred.'
+        google = get_google_auth(token=token)
+        resp = google.get(ProductionConfig.USER_INFO)
+        if resp.status_code == 200:
             user_data = resp.json()
             email = user_data['email']
             user = User.query.filter_by(email=email).first()
@@ -136,23 +133,24 @@ def callback():
                 user = User()
                 user.email = email
             user.name = user_data['name']
+            print(token)
             user.tokens = json.dumps(token)
             user.avatar = user_data['picture']
             db.session.add(user)
             db.session.commit()
             login_user(user)
             return redirect(url_for('index'))
-
         return 'Could not fetch your information.'
 
 
 @app.route('/', methods=["POST", "GET"])
 def index():
     v_ = Videos.query.all()
-
     videos_json = [video.serialize() for video in v_]
     if request.method == "POST" and current_user.is_authenticated:
         return render_template("index.html", links=videos_json, authenticated=True, doc="ULabs Voting Space")
+    elif request.method == "POST" and not current_user.is_authenticated:
+        return redirect(url_for('login'))
     return render_template("index.html", links=videos_json, doc="ULabs Voting Space")
 
 
@@ -176,7 +174,6 @@ def thankyou():
 @login_required
 def logout():
     key = [session.pop(key) for key in list(session.keys())]
-
     logout_user()
     return redirect(url_for('index'))
 
@@ -227,8 +224,8 @@ def dash():
 
 
 if __name__ == "__main__":
-    # app.run(debug=True, ssl_context=('./ssl.crt', './ssl.key'))
-    app.run(debug=True)
+    app.run(debug=True, ssl_context=('./ssl.crt', './ssl.key'))
+    # app.run(debug=True)
 
 
 # class User(db.Model):
