@@ -99,9 +99,11 @@ def google_login():
 def google_auth_redirect():
     req_state = flask.request.args.get('state', default=None, type=None)
 
-    if req_state != flask.session[AUTH_STATE_KEY]:
-        return flask.redirect(flask.url_for('index'))
-
+    try:
+        if req_state != flask.session[AUTH_STATE_KEY]:
+            return flask.redirect(flask.url_for('index'))
+    except:
+        pass
     session = OAuth2Session(CLIENT_ID, CLIENT_SECRET,
                             scope=AUTHORIZATION_SCOPE,
                             state=flask.session[AUTH_STATE_KEY],
