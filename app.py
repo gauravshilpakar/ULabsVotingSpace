@@ -25,7 +25,7 @@ import google_auth
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config["SQLALCHEMY_DATABASE_URI"] = ProductionConfig.SQLALCHEMY_DATABASE_URI
+app.config["SQLALCHEMY_DATABASE_URI"] = DevelopmentConfig.SQLALCHEMY_DATABASE_URI
 app.secret_key = str(uuid.uuid4())
 app.register_blueprint(google_auth.app)
 
@@ -82,16 +82,16 @@ def load_user(user_id):
 
 # def get_google_auth(state=None, token=None):
 #     if token:
-#         return OAuth2Session(ProductionConfig.CLIENT_ID, token=token)
+#         return OAuth2Session(DevelopmentConfig.CLIENT_ID, token=token)
 #     if state:
 #         return OAuth2Session(
-#             ProductionConfig.CLIENT_ID,
+#             DevelopmentConfig.CLIENT_ID,
 #             state=state,
-#             redirect_uri=ProductionConfig.REDIRECT_URI)
+#             redirect_uri=DevelopmentConfig.REDIRECT_URI)
 #     oauth = OAuth2Session(
-#         ProductionConfig.CLIENT_ID,
-#         redirect_uri=ProductionConfig.REDIRECT_URI,
-#         scope=ProductionConfig.SCOPE)
+#         DevelopmentConfig.CLIENT_ID,
+#         redirect_uri=DevelopmentConfig.REDIRECT_URI,
+#         scope=DevelopmentConfig.SCOPE)
 #     return oauth
 
 
@@ -119,13 +119,13 @@ def loginwithgoogle():
 #         google = get_google_auth(state=session['oauth_state'])
 #         # try:
 #         token = google.fetch_token(
-#             ProductionConfig.TOKEN_URI,
-#             client_secret=ProductionConfig.CLIENT_SECRET,
+#             DevelopmentConfig.TOKEN_URI,
+#             client_secret=DevelopmentConfig.CLIENT_SECRET,
 #             authorization_response=request.url)
 #         # except HTTPError:
 #         #     return 'HTTPError occurred.'
 #         google = get_google_auth(token=token)
-#         resp = google.get(ProductionConfig.USER_INFO)
+#         resp = google.get(DevelopmentConfig.USER_INFO)
 #         if resp.status_code == 200:
 
 #             return redirect(url_for('index'))

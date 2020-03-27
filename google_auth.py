@@ -14,10 +14,10 @@ AUTHORIZATION_URL = 'https://accounts.google.com/o/oauth2/v2/auth?access_type=of
 
 AUTHORIZATION_SCOPE = 'openid email profile'
 
-AUTH_REDIRECT_URI = ProductionConfig.FN_AUTH_REDIRECT_URI
-BASE_URI = ProductionConfig.FN_BASE_URI
-CLIENT_ID = ProductionConfig.FN_CLIENT_ID
-CLIENT_SECRET = ProductionConfig.FN_CLIENT_SECRET
+AUTH_REDIRECT_URI = DevelopmentConfig.FN_AUTH_REDIRECT_URI
+BASE_URI = DevelopmentConfig.FN_BASE_URI
+CLIENT_ID = DevelopmentConfig.FN_CLIENT_ID
+CLIENT_SECRET = DevelopmentConfig.FN_CLIENT_SECRET
 
 AUTH_TOKEN_KEY = 'auth_token'
 AUTH_STATE_KEY = 'auth_state'
@@ -69,10 +69,14 @@ def no_cache(view):
 @no_cache
 def google_login():
     from app import Users, db
-    google_session = OAuth2Session(CLIENT_ID, CLIENT_SECRET,
-                                   scope=AUTHORIZATION_SCOPE,
-                                   redirect_uri=AUTH_REDIRECT_URI)
-    uri, state = google_session.create_authorization_url(AUTHORIZATION_URL)
+    state = None
+    while state is None:
+        google_session = OAuth2Session(CLIENT_ID, CLIENT_SECRET,
+                                       scope=AUTHORIZATION_SCOPE,
+                                       redirect_uri=AUTH_REDIRECT_URI)
+        uri, state = google_session.create_authorization_url(AUTHORIZATION_URL)
+
+    print(f"\n\n\nGoogle Auth State: \n\n{state}\n\n\n")
     flask.session[AUTH_STATE_KEY] = state
     flask.session.permanent = True
 
@@ -91,7 +95,7 @@ def google_login():
         db.session.commit()
     except:
         return flask.redirect(uri, code=302)
-    return flask.redirect(uri, code=302)
+    return flask.redirect(uri, code=200)
 
 
 @app.route('/google/auth')
