@@ -75,10 +75,10 @@ def google_login():
                                        scope=AUTHORIZATION_SCOPE,
                                        redirect_uri=AUTH_REDIRECT_URI)
         uri, state = google_session.create_authorization_url(AUTHORIZATION_URL)
+        flask.session[AUTH_STATE_KEY] = state
 
-    print(f"\n\n\nGoogle Auth State: \n\n{state}\n\n\n")
-    flask.session[AUTH_STATE_KEY] = state
-    flask.session.permanent = True
+    print(f"\n\nGoogle Auth State: \n\n{state}\n\n")
+    # flask.session.permanent = True
 
     try:
         user_info = get_user_info()

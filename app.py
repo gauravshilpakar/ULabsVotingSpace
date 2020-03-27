@@ -136,29 +136,35 @@ def loginwithgoogle():
 def index():
     v_ = Videos.query.all()
     videos_json = [video.serialize() for video in v_]
-
-    if request.method == "POST" and google_auth.is_logged_in():
-        return render_template("index.html",
-                               links=videos_json,
-                               google_authenticated=True,
-                               authenticated=True,
-                               doc="ULabs Voting Space",
-                               user_info=google_auth.get_user_info())
+    if google_auth.is_logged_in():
+        if request.method == "POST":
+            return render_template("index.html",
+                                   links=videos_json,
+                                   google_authenticated=True,
+                                   authenticated=True,
+                                   doc="ULabs Voting Space",
+                                   user_info=google_auth.get_user_info())
+        else:
+            return render_template("index.html",
+                                   links=videos_json,
+                                   doc="ULabs Voting Space",
+                                   google_authenticated=True,
+                                   user_info=google_auth.get_user_info())
     elif request.method == "POST" and not google_auth.is_logged_in():
         return redirect(url_for('login'))
 
-    elif google_auth.is_logged_in():
-        return render_template("index.html",
-                               links=videos_json,
-                               doc="ULabs Voting Space",
-                               google_authenticated=True,
-                               user_info=google_auth.get_user_info())
     else:
-        return render_template("index.html",
-                               links=videos_json,
-                               doc="ULabs Voting Space",
-                               google_authenticated=False,
-                               )
+        if google_auth.is_logged_in():
+            return render_template("index.html",
+                                   links=videos_json,
+                                   doc="ULabs Voting Space",
+                                   google_authenticated=True,
+                                   )
+        else:
+            return render_template("index.html",
+                                   links=videos_json,
+                                   doc="ULabs Voting Space",
+                                   google_authenticated=False)
 
 
 @app.route('/thankyou/', methods=['POST', 'GET'])
