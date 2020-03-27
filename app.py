@@ -1,10 +1,10 @@
-import dash_bootstrap_components as dbc
 import datetime
 import json
 import os
 import uuid
 
 import dash
+import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
 import requests
@@ -19,16 +19,17 @@ from flask_sqlalchemy import SQLAlchemy
 from oauthlib.oauth2 import WebApplicationClient
 from requests.exceptions import HTTPError
 from requests_oauthlib import OAuth2Session
-
 from config import *
+
+import google_auth
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config["SQLALCHEMY_DATABASE_URI"] = ProductionConfig.SQLALCHEMY_DATABASE_URI
 app.secret_key = str(uuid.uuid4())
+app.register_blueprint(google_auth.app)
 
 admin = Admin(app)
-
 db = SQLAlchemy(app)
 
 login_manager = LoginManager()
@@ -57,101 +58,106 @@ class Videos(db.Model, UserMixin):
         }
 
 
-class User(db.Model, UserMixin):
-    __tablename__ = "users"
-    id = db.Column(db.Integer, primary_key=True)
+class Users(db.Model, UserMixin):
+    _id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100), unique=True, nullable=False)
     name = db.Column(db.String(100), nullable=True)
     avatar = db.Column(db.String(200))
-    active = db.Column(db.Boolean, default=False)
-    tokens = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow())
 
+    def __init__(self, email=None, name=None, avatar=None):
+        self.email = email
+        self.name = name
+        self.avatar = avatar
 
-admin.add_view(ModelView(User, db.session))
+
+admin.add_view(ModelView(Users, db.session))
 admin.add_view(ModelView(Videos, db.session))
 
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return Users.query.get(int(user_id))
 
 
-def get_google_auth(state=None, token=None):
-    if token:
-        return OAuth2Session(ProductionConfig.CLIENT_ID, token=token)
-    if state:
-        return OAuth2Session(
-            ProductionConfig.CLIENT_ID,
-            state=state,
-            redirect_uri=ProductionConfig.REDIRECT_URI)
-    oauth = OAuth2Session(
-        ProductionConfig.CLIENT_ID,
-        redirect_uri=ProductionConfig.REDIRECT_URI,
-        scope=ProductionConfig.SCOPE)
-    return oauth
+# def get_google_auth(state=None, token=None):
+#     if token:
+#         return OAuth2Session(ProductionConfig.CLIENT_ID, token=token)
+#     if state:
+#         return OAuth2Session(
+#             ProductionConfig.CLIENT_ID,
+#             state=state,
+#             redirect_uri=ProductionConfig.REDIRECT_URI)
+#     oauth = OAuth2Session(
+#         ProductionConfig.CLIENT_ID,
+#         redirect_uri=ProductionConfig.REDIRECT_URI,
+#         scope=ProductionConfig.SCOPE)
+#     return oauth
 
 
-@app.route('/login', methods=["GET", "POST"])
+@app.route('/login/', methods=["GET", "POST"])
 def login():
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
-    google = get_google_auth()
-    auth_url, state = google.authorization_url(
-        ProductionConfig.AUTH_URI, access_type='offline')
-    session['oauth_state'] = state
-    print(f"\n\n\n\nsesh:\n {session['oauth_state']}\n\n\n\n")
-    return render_template('login.html', auth_url=auth_url, doc="Login!")
+    return render_template("login.html", doc="Login!")
 
 
-@app.route('/gCallback')
-def callback():
-    if current_user is not None and current_user.is_authenticated:
-        return redirect(url_for('index'))
-    if 'error' in request.args:
-        if request.args.get('error') == 'access_denied':
-            return 'You denied access.'
-        return 'Error encountered.'
-    if 'code' not in request.args and 'state' not in request.args:
-        return redirect(url_for('login'))
-    else:
-        google = get_google_auth(state=session['oauth_state'])
-        # try:
-        token = google.fetch_token(
-            ProductionConfig.TOKEN_URI,
-            client_secret=ProductionConfig.CLIENT_SECRET,
-            authorization_response=request.url)
-        # except HTTPError:
-        #     return 'HTTPError occurred.'
-        google = get_google_auth(token=token)
-        resp = google.get(ProductionConfig.USER_INFO)
-        if resp.status_code == 200:
-            user_data = resp.json()
-            email = user_data['email']
-            user = User.query.filter_by(email=email).first()
-            if user is None:
-                user = User()
-                user.email = email
-            user.name = user_data['name']
-            print(token)
-            user.tokens = json.dumps(token)
-            user.avatar = user_data['picture']
-            db.session.add(user)
-            db.session.commit()
-            login_user(user)
-            return redirect(url_for('index'))
-        return 'Could not fetch your information.'
+@app.route("/google/login")
+def loginwithgoogle():
+    return google_auth.google_login()
+
+
+# @app.route('/gCallback')
+# def callback():
+#     if current_user is not None and current_user.is_authenticated:
+#         return redirect(url_for('index'))
+#     if 'error' in request.args:
+#         if request.args.get('error') == 'access_denied':
+#             return 'You denied access.'
+#         return 'Error encountered.'
+#     if 'code' not in request.args and 'state' not in request.args:
+#         return redirect(url_for('login'))
+#     else:
+#         google = get_google_auth(state=session['oauth_state'])
+#         # try:
+#         token = google.fetch_token(
+#             ProductionConfig.TOKEN_URI,
+#             client_secret=ProductionConfig.CLIENT_SECRET,
+#             authorization_response=request.url)
+#         # except HTTPError:
+#         #     return 'HTTPError occurred.'
+#         google = get_google_auth(token=token)
+#         resp = google.get(ProductionConfig.USER_INFO)
+#         if resp.status_code == 200:
+
+#             return redirect(url_for('index'))
+#         return 'Could not fetch your information.'
 
 
 @app.route('/', methods=["POST", "GET"])
 def index():
     v_ = Videos.query.all()
     videos_json = [video.serialize() for video in v_]
-    if request.method == "POST" and current_user.is_authenticated:
-        return render_template("index.html", links=videos_json, authenticated=True, doc="ULabs Voting Space")
-    elif request.method == "POST" and not current_user.is_authenticated:
+    if request.method == "POST" and google_auth.is_logged_in():
+        return render_template("index.html",
+                               links=videos_json,
+                               google_authenticated=True,
+                               authenticated=True,
+                               doc="ULabs Voting Space",
+                               user_info=google_auth.get_user_info())
+    elif request.method == "POST" and not google_auth.is_logged_in():
         return redirect(url_for('login'))
-    return render_template("index.html", links=videos_json, doc="ULabs Voting Space")
+
+    elif google_auth.is_logged_in():
+        return render_template("index.html",
+                               links=videos_json,
+                               doc="ULabs Voting Space",
+                               google_authenticated=True,
+                               user_info=google_auth.get_user_info())
+    else:
+        return render_template("index.html",
+                               links=videos_json,
+                               doc="ULabs Voting Space",
+                               google_authenticated=False,
+                               )
 
 
 @app.route('/thankyou/', methods=['POST', 'GET'])
@@ -167,20 +173,29 @@ def thankyou():
         print("\n\n\nPost Commit")
         print(selected_video.name)
         print(selected_video.votes)
-        return render_template("thankyou.html", doc="Thank You!")
+
+        return render_template("thankyou.html",
+                               doc="Thank You!",
+                               google_authenticated=True,
+                               user_info=google_auth.get_user_info())
 
 
 @app.route('/logout')
 @login_required
 def logout():
-    key = [session.pop(key) for key in list(session.keys())]
-    logout_user()
-    return redirect(url_for('index'))
+    return redirect(url_for('google_logout'))
 
 
 @app.route("/results/")
 def results():
-    return render_template('results.html')
+    if google_auth.is_logged_in():
+        return render_template('results.html',
+                               doc="Poll Results",
+                               google_authenticated=True,
+                               user_info=google_auth.get_user_info())
+
+    return render_template('results.html',
+                           doc="Poll Results",)
 
 
 dash_app = dash.Dash(__name__,
@@ -224,8 +239,8 @@ def dash():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, ssl_context=('./ssl.crt', './ssl.key'))
-    # app.run(debug=True)
+    # app.run(debug=True, ssl_context=('./ssl.crt', './ssl.key'))
+    app.run(debug=True)
 
 
 # class User(db.Model):

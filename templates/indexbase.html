@@ -11,10 +11,11 @@
         <ul class="navbar-nav mr-auto"></ul>
         <span class="navbar-text">
             <ul class="navbar-nav mr-auto">
-                {% if current_user.is_authenticated %}
+                {% if google_authenticated %}
                 <li class="nav-item active">
-                    <img src="{{current_user.avatar}}?sz=20" class="usericon" alt="{{current_user.name}}"><a
-                        class="nav-link" href="#">{{current_user.name}} <span class="sr-only">(current)</span></a>
+                    <img src="{{ user_info['picture'] }}" class="usericon" alt=""><a
+                        class="nav-link" href="#">{{ user_info['name'] }}
+                        <span class="sr-only">(current)</span></a>
                 </li>
                 <li class="nav-item">
                     <a class="login" href="{{url_for('logout')}}">logout!</a>
