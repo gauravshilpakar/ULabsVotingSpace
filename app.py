@@ -136,6 +136,7 @@ def loginwithgoogle():
 def index():
     v_ = Videos.query.all()
     videos_json = [video.serialize() for video in v_]
+
     if request.method == "POST" and google_auth.is_logged_in():
         return render_template("index.html",
                                links=videos_json,

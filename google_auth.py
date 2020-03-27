@@ -69,10 +69,10 @@ def no_cache(view):
 @no_cache
 def google_login():
     from app import Users, db
-    session = OAuth2Session(CLIENT_ID, CLIENT_SECRET,
-                            scope=AUTHORIZATION_SCOPE,
-                            redirect_uri=AUTH_REDIRECT_URI)
-    uri, state = session.create_authorization_url(AUTHORIZATION_URL)
+    google_session = OAuth2Session(CLIENT_ID, CLIENT_SECRET,
+                                   scope=AUTHORIZATION_SCOPE,
+                                   redirect_uri=AUTH_REDIRECT_URI)
+    uri, state = google_session.create_authorization_url(AUTHORIZATION_URL)
     flask.session[AUTH_STATE_KEY] = state
     flask.session.permanent = True
 
@@ -100,8 +100,7 @@ def google_auth_redirect():
     req_state = flask.request.args.get('state', default=None, type=None)
 
     if req_state != flask.session[AUTH_STATE_KEY]:
-        response = flask.make_response('Invalid state parameter', 401)
-        return response
+        return flask.redirect(flask.url_for('index'))
 
     session = OAuth2Session(CLIENT_ID, CLIENT_SECRET,
                             scope=AUTHORIZATION_SCOPE,
@@ -123,4 +122,4 @@ def google_logout():
     flask.session.pop(AUTH_TOKEN_KEY, None)
     flask.session.pop(AUTH_STATE_KEY, None)
 
-    return flask.redirect(BASE_URI, code=302)
+    return flask.redirect(flask.url_for('index'), code=302)
